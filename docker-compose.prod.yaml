@@ -1,0 +1,47 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: wash-booking-db
+    environment:
+      POSTGRES_USER: washuser
+      POSTGRES_PASSWORD: washpass
+      POSTGRES_DB: washbooking
+    volumes:
+      # Persist database data
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U washuser -d washbooking" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wash-network
+
+  # FastAPI Application
+  app:
+    # Use pre-built image instead of building
+    image: wash-booking-app:latest
+    container_name: wash-booking-app
+    environment:
+      DATABASE_URL: postgresql://washuser:washpass@db:5432/washbooking
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wash-network
+    restart: unless-stopped
+
+volumes:
+  # Named volume for PostgreSQL data persistence
+  postgres_data:
+    driver: local
+
+networks:
+  # Custom network for service communication
+  wash-network:
+    driver: bridge

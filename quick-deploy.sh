@@ -1,0 +1,21 @@
+#!/bin/bash
+# Quick deployment commands for Amazon Linux
+
+echo "🚀 Wash Booking Application - Quick Deploy"
+echo "=========================================="
+echo ""
+echo "Run these commands on your Amazon Linux server:"
+echo ""
+echo "# 1. Build the Docker image"
+echo "docker build -t wash-booking-app:latest ."
+echo ""
+echo "# 2. Start the services"
+echo "docker-compose up -d"
+echo ""
+echo "# 3. Check status"
+echo "docker-compose ps"
+echo ""
+echo "# 4. View logs"
+echo "docker-compose logs -f"
+echo ""
+echo "=========================================="
