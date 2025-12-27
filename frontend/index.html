@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wash Booking - Premium Car & Bike Wash Services</title>
+    <meta name="description" content="Book premium car and bike wash services across Indian cities">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span class="brand-name">WashBooking</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#booking" class="nav-link">Book Now</a>
+                <a href="#vendors" class="nav-link">For Vendors</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Premium Wash Services at Your Doorstep</h1>
+                <p class="hero-subtitle">Book professional car and bike wash services across India. Fast, reliable, and affordable.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('booking')">Book Now</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('services')">View Services</button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBookings">0</div>
+                    <div class="stat-label">Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVendors">0</div>
+                    <div class="stat-label">Vendors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCustomers">0</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <p class="section-subtitle">Choose from our range of premium wash services</p>
+            
+            <div class="services-grid" id="servicesGrid">
+                <!-- Services will be loaded dynamically -->
+                <div class="service-card loading">
+                    <div class="loading-shimmer"></div>
+                </div>
+                <div class="service-card loading">
+                    <div class="loading-shimmer"></div>
+                </div>
+                <div class="service-card loading">
+                    <div class="loading-shimmer"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="booking">
+        <div class="container">
+            <h2 class="section-title">Book Your Service</h2>
+            <p class="section-subtitle">Fill in the details below to book your wash service</p>
+            
+            <div class="booking-container">
+                <!-- Customer Form -->
+                <div class="booking-card">
+                    <h3 class="card-title">Customer Details</h3>
+                    <form id="customerForm" class="form">
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" required placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email</label>
+                            <input type="email" id="customerEmail" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" required placeholder="9876543210" pattern="[6-9][0-9]{9}">
+                            <small>10 digits starting with 6-9</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerCity">City</label>
+                            <select id="customerCity" required>
+                                <option value="">Select City</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Bangalore">Bangalore</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Kolkata">Kolkata</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Ahmedabad">Ahmedabad</option>
+                                <option value="Jaipur">Jaipur</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Continue to Booking</button>
+                    </form>
+                </div>
+
+                <!-- Booking Form -->
+                <div class="booking-card" id="bookingFormCard" style="display: none;">
+                    <h3 class="card-title">Booking Details</h3>
+                    <form id="bookingForm" class="form">
+                        <div class="form-group">
+                            <label for="vendorSelect">Select Vendor</label>
+                            <select id="vendorSelect" required>
+                                <option value="">Loading vendors...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceSelect">Select Service</label>
+                            <select id="serviceSelect" required disabled>
+                                <option value="">Select vendor first</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleType">Vehicle Type</label>
+                            <select id="vehicleType" required>
+                                <option value="">Select Type</option>
+                                <option value="car">Car</option>
+                                <option value="bike">Bike</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookingDate">Booking Date</label>
+                            <input type="date" id="bookingDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookingTime">Preferred Time</label>
+                            <select id="bookingTime" required>
+                                <option value="">Select Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle Number (Optional)</label>
+                            <input type="text" id="vehicleNumber" placeholder="MH01AB1234">
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceAddress">Service Address (Optional)</label>
+                            <textarea id="serviceAddress" rows="3" placeholder="Enter your address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode (Optional)</label>
+                            <input type="text" id="pincode" placeholder="400001" pattern="[0-9]{6}">
+                            <small>6 digit pincode</small>
+                        </div>
+                        <div class="booking-summary" id="bookingSummary" style="display: none;">
+                            <h4>Booking Summary</h4>
+                            <div class="summary-item">
+                                <span>Service:</span>
+                                <span id="summaryService">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Price:</span>
+                                <span id="summaryPrice" class="price">₹0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Duration:</span>
+                                <span id="summaryDuration">-</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Confirm Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vendors Section -->
+    <section id="vendors" class="vendors">
+        <div class="container">
+            <h2 class="section-title">Register as a Vendor</h2>
+            <p class="section-subtitle">Join our platform and grow your business</p>
+            
+            <div class="vendor-registration">
+                <form id="vendorForm" class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vendorName">Business Name</label>
+                            <input type="text" id="vendorName" required placeholder="Your business name">
+                        </div>
+                        <div class="form-group">
+                            <label for="vendorEmail">Email</label>
+                            <input type="email" id="vendorEmail" required placeholder="business@email.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vendorPhone">Phone Number</label>
+                            <input type="tel" id="vendorPhone" required placeholder="9876543210" pattern="[6-9][0-9]{9}">
+                        </div>
+                        <div class="form-group">
+                            <label for="vendorCity">City</label>
+                            <select id="vendorCity" required>
+                                <option value="">Select City</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Bangalore">Bangalore</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Kolkata">Kolkata</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Ahmedabad">Ahmedabad</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceArea">Service Area</label>
+                        <input type="text" id="serviceArea" required placeholder="Pincodes or neighborhoods (e.g., 400001, Andheri, Bandra)">
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorAddress">Address</label>
+                        <textarea id="vendorAddress" rows="3" placeholder="Your business address"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Register as Vendor</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>WashBooking</h4>
+                    <p>Premium wash services across India</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#home">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#booking">Book Now</a>
+                    <a href="#vendors">For Vendors</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: support@washbooking.com</p>
+                    <p>Phone: 1800-123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 WashBooking. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
