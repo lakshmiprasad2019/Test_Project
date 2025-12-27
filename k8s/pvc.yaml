@@ -1,0 +1,26 @@
+---
+# PersistentVolumeClaim for PostgreSQL data persistence
+# This ensures database data survives pod restarts and rescheduling
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  labels:
+    app: wash-booking
+    component: database
+spec:
+  # Access mode: ReadWriteOnce means the volume can be mounted as read-write by a single node
+  accessModes:
+    - ReadWriteOnce
+  
+  # Storage class: Use default storage class or specify cloud provider storage class
+  # For AWS: gp2, gp3
+  # For GCP: standard, pd-ssd
+  # For Azure: default, managed-premium
+  # storageClassName: standard  # Uncomment and modify based on your cluster
+  
+  resources:
+    requests:
+      # Request 5Gi of storage for PostgreSQL data
+      # Adjust based on expected data volume
+      storage: 5Gi

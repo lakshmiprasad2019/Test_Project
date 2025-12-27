@@ -1,0 +1,190 @@
+---
+# PostgreSQL Database Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: wash-booking
+    component: database
+spec:
+  # Single replica for PostgreSQL (stateful workload)
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wash-booking
+      component: database
+  template:
+    metadata:
+      labels:
+        app: wash-booking
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        
+        # Environment variables for PostgreSQL configuration
+        env:
+        - name: POSTGRES_USER
+          value: "washuser"
+        - name: POSTGRES_PASSWORD
+          # In production, use Kubernetes Secrets instead of plain text
+          value: "washpass"
+        - name: POSTGRES_DB
+          value: "washbooking"
+        
+        # Volume mount for data persistence
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+          # SubPath prevents PostgreSQL from failing due to lost+found directory
+          subPath: postgres
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Liveness probe: checks if container is running
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - washuser
+            - -d
+            - washbooking
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe: checks if container is ready to serve traffic
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - washuser
+            - -d
+            - washbooking
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      
+      # Volume definition using PVC
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
+---
+# FastAPI Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wash-booking-deployment
+  labels:
+    app: wash-booking
+    component: api
+spec:
+  # Multiple replicas for high availability
+  replicas: 3
+  
+  # Rolling update strategy for zero-downtime deployments
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Maximum number of pods that can be created over desired replicas
+      maxUnavailable: 1  # Maximum number of pods that can be unavailable during update
+  
+  selector:
+    matchLabels:
+      app: wash-booking
+      component: api
+  
+  template:
+    metadata:
+      labels:
+        app: wash-booking
+        component: api
+    spec:
+      containers:
+      - name: wash-booking-api
+        # Replace with your actual Docker image
+        # For example: your-registry/wash-booking:v1.0.0
+        image: wash-booking-app:latest
+        imagePullPolicy: IfNotPresent  # Use Always for production with proper tags
+        
+        ports:
+        - containerPort: 8000
+          name: http
+        
+        # Environment variables
+        env:
+        - name: DATABASE_URL
+          # In production, use Kubernetes Secrets or ConfigMaps
+          value: "postgresql://washuser:washpass@postgres-service:5432/washbooking"
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Liveness probe: checks if application is running
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe: checks if application is ready to serve traffic
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Startup probe: gives application time to start before liveness/readiness probes
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+      
+      # Init container to wait for database to be ready
+      initContainers:
+      - name: wait-for-db
+        image: busybox:1.35
+        command: 
+        - sh
+        - -c
+        - |
+          echo "Waiting for PostgreSQL to be ready..."
+          until nc -z postgres-service 5432; do
+            echo "Waiting for database connection..."
+            sleep 2
+          done
+          echo "Database is ready!"

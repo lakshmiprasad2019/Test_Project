@@ -1,0 +1,90 @@
+---
+# PostgreSQL Service
+# ClusterIP service for internal database access only
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    app: wash-booking
+    component: database
+spec:
+  type: ClusterIP  # Internal service, not exposed outside cluster
+  selector:
+    app: wash-booking
+    component: database
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  
+  # Session affinity ensures requests from same client go to same pod
+  sessionAffinity: ClientIP
+
+---
+# FastAPI Application Service
+# LoadBalancer service to expose API externally
+apiVersion: v1
+kind: Service
+metadata:
+  name: wash-booking-service
+  labels:
+    app: wash-booking
+    component: api
+spec:
+  # Service type options:
+  # - LoadBalancer: Exposes service externally using cloud provider's load balancer
+  # - NodePort: Exposes service on each node's IP at a static port
+  # - ClusterIP: Internal service only (default)
+  type: LoadBalancer
+  
+  selector:
+    app: wash-booking
+    component: api
+  
+  ports:
+  - port: 8000        # Port exposed by the service
+    targetPort: 8000  # Port on the container
+    protocol: TCP
+    name: http
+    # nodePort: 30080  # Uncomment for NodePort type (range: 30000-32767)
+  
+  # Session affinity for sticky sessions (optional)
+  # sessionAffinity: ClientIP
+  # sessionAffinityConfig:
+  #   clientIP:
+  #     timeoutSeconds: 10800  # 3 hours
+
+---
+# Optional: Ingress for advanced routing and SSL termination
+# Uncomment and configure based on your ingress controller (nginx, traefik, etc.)
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: wash-booking-ingress
+#   labels:
+#     app: wash-booking
+#   annotations:
+#     # Example annotations for nginx ingress controller
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+#     # For SSL/TLS termination
+#     # cert-manager.io/cluster-issuer: letsencrypt-prod
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: wash-booking.example.com  # Replace with your domain
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: wash-booking-service
+#             port:
+#               number: 8000
+#   # TLS configuration
+#   # tls:
+#   # - hosts:
+#   #   - wash-booking.example.com
+#   #   secretName: wash-booking-tls
