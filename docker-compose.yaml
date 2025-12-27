@@ -22,9 +22,7 @@ services:
 
   # FastAPI Application
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: wash-booking-app:latest
     container_name: wash-booking-app
     environment:
       DATABASE_URL: postgresql://washuser:washpass@db:5432/washbooking
